@@ -1,14 +1,17 @@
 import argparse
 import os
 import random
+from utils import delimiter
+
 
 def get_arguments():
-    parser = argparse.ArgumentParser(description='Shuffle')
-    parser.add_argument('--root_dir', type=str, default='dataset-resized/')
-    parser.add_argument('--train', type=float, default=0.7)
-    parser.add_argument('--val', type=float, default=0.13)
-    parser.add_argument('--test', type=float, default=0.17)
-    return parser.parse_args()
+	parser = argparse.ArgumentParser(description='Shuffle')
+	parser.add_argument('--root_dir', type=str, default='dataset-resized'+delimiter())
+	parser.add_argument('--train', type=float, default=0.7)
+	parser.add_argument('--val', type=float, default=0.13)
+	parser.add_argument('--test', type=float, default=0.17)
+	return parser.parse_args()
+
 
 def split_data(args):
 	root_dir = args.root_dir
@@ -35,7 +38,7 @@ def split_data(args):
 					random.shuffle(files)
 					num_train = int(train_rate * len(files))
 					num_val = int(val_rate * len(files))
-					
+
 					for train_data in files[:num_train]:
 						train.write(train_data + '\n')
 

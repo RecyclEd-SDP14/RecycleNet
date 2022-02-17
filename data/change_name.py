@@ -1,7 +1,8 @@
 import os
+from utils import delimiter
 
 def change_name():
-    root_dir = 'real-data/'
+    root_dir = 'real-data' + delimiter()
     folders = [files for _, files, _ in os.walk(root_dir)][0]
     os.chdir(root_dir)
     
@@ -15,4 +16,4 @@ def main():
     change_name()
 
 if __name__ == '__main__':
-	main()
+    main()

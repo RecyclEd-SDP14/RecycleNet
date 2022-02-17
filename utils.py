@@ -1,5 +1,6 @@
 import torch
-import numpy as np
+import platform
+
 
 def indexes_to_one_hot(indexes, n_dims=None):
     """Converts a vector of indexes to a batch of one-hot vectors. """
@@ -8,3 +9,11 @@ def indexes_to_one_hot(indexes, n_dims=None):
     one_hots = torch.zeros(indexes.size()[0], n_dims).scatter_(1, indexes, 1)
     one_hots = one_hots.view(*(indexes.shape-1))
     return one_hots.type(torch.LongTensor)
+
+
+def delimiter():
+    if platform.system() == 'Windows':
+        separator = "\\"
+    else:
+        separator = "/"
+    return separator

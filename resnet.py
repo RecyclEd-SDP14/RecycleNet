@@ -1,15 +1,10 @@
-import torch
 import torch.nn as nn
-import torch.nn.functional as F
 import torch.utils.model_zoo as model_zoo
 from attention import AttentionModule
-#from cbam import CBAM
 from SE import SELayer
-import matplotlib.pyplot as plt
 
 __all__ = ['ResNet', 'resnet18', 'resnet34', 'resnet50', 'resnet101',
            'resnet152']
-
 
 model_urls = {
     'resnet18': 'https://download.pytorch.org/models/resnet18-5c106cde.pth',
@@ -44,8 +39,8 @@ class BasicBlock(nn.Module):
             assert att_mode in ['ours', 'cbam', 'se']
             if att_mode == 'ours':
                 self.att = AttentionModule(planes)
-            elif att_mode == 'cbam':
-                self.att = CBAM(planes)
+            # elif att_mode == 'cbam':
+            #    self.att = CBAM(planes)
             elif att_mode == 'se':
                 self.att = SELayer(planes)
 
@@ -91,10 +86,11 @@ class Bottleneck(nn.Module):
             assert att_mode in ['ours', 'cbam', 'se']
             if att_mode == 'ours':
                 self.att = AttentionModule(planes * self.expansion)
-            elif att_mode == 'cbam':
-                self.att = CBAM(planes * self.expansion)
+            # elif att_mode == 'cbam':
+            #    self.att = CBAM(planes * self.expansion)
             elif att_mode == 'se':
                 self.att = SELayer(planes * self.expansion)
+
     def forward(self, x):
         residual = x
 
@@ -137,12 +133,12 @@ class ResNet(nn.Module):
         self.layer3 = self._make_layer(block, 256, layers[2], stride=2, use_att=False, att_mode=att_mode)
         self.layer4 = self._make_layer(block, 512, layers[3], stride=2, use_att=False, att_mode=att_mode)
         self.avgpool = nn.AvgPool2d(7, stride=1)
-                           
+
         self.final_fc = nn.Linear(512 * block.expansion, num_classes)
 
         self.use_att = use_att
         if use_att:
-            self.att = AttentionModule(512*block.expansion)
+            self.att = AttentionModule(512 * block.expansion)
         self.num_classes = num_classes
         for m in self.modules():
             if isinstance(m, nn.Conv2d):
@@ -160,8 +156,7 @@ class ResNet(nn.Module):
                 nn.BatchNorm2d(planes * block.expansion),
             )
 
-        layers = []
-        layers.append(block(self.inplanes, planes, stride, downsample, use_att=use_att, att_mode=att_mode))
+        layers = [block(self.inplanes, planes, stride, downsample, use_att=use_att, att_mode=att_mode)]
         self.inplanes = planes * block.expansion
         for i in range(1, blocks):
             layers.append(block(self.inplanes, planes, use_att=use_att, att_mode=att_mode))
@@ -175,9 +170,9 @@ class ResNet(nn.Module):
         x = self.relu(x)
         x = self.maxpool(x)
 
-        x = self.layer1(x) # 64
-        x = self.layer2(x) # 128
-        x = self.layer3(x) # 
+        x = self.layer1(x)  # 64
+        x = self.layer2(x)  # 128
+        x = self.layer3(x)  #
         x4 = self.layer4(x)
 
         if self.use_att:
@@ -187,6 +182,7 @@ class ResNet(nn.Module):
         x = x.view(x.size(0), -1)
         x = self.final_fc(x)
         return x, x4
+
 
 def resnet18(pretrained=False, **kwargs):
     """Constructs a ResNet-18 model.
