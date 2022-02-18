@@ -24,6 +24,7 @@ parser.add_argument('--cuda', default=False, type=bool)
 parser.add_argument('--save_dir', default='capture_img.jpg', type=str)
 parser.add_argument('--use_att', action='store_true', help='use attention module')
 parser.add_argument('--arch', type=str, default='resnet18_base', help='resnet18, 34, 50, 101, 152')
+parser.add_argument('--no_pretrain', action='store_false', help='training from scratch')
 
 args = parser.parse_args()
 
@@ -34,15 +35,20 @@ else:
 
 model = nn.DataParallel(resnet.resnet18(pretrained=True, use_att=args.use_att, num_classes=len(TRASH_DICT)))
 if args.arch == 'resnet18_base':
-    model = nn.DataParallel(resnet.resnet18(pretrained=True, use_att=args.use_att, num_classes=len(TRASH_DICT)))
+    model = nn.DataParallel(resnet.resnet18(pretrained=not args.no_pretrain if not args.resume else False,
+                                            use_att=args.use_att, num_classes=len(TRASH_DICT)))
 elif args.arch == 'resnet34_base':
-    model = nn.DataParallel(resnet.resnet34(pretrained=True, use_att=args.use_att, num_classes=len(TRASH_DICT)))
+    model = nn.DataParallel(resnet.resnet34(pretrained=not args.no_pretrain if not args.resume else False,
+                                            use_att=args.use_att, num_classes=len(TRASH_DICT)))
 elif args.arch == 'resnet50_base':
-    model = nn.DataParallel(resnet.resnet50(pretrained=True, use_att=args.use_att, num_classes=len(TRASH_DICT)))
+    model = nn.DataParallel(resnet.resnet50(pretrained=not args.no_pretrain if not args.resume else False,
+                                            use_att=args.use_att, num_classes=len(TRASH_DICT)))
 elif args.arch == 'resnet101_base':
-    model = nn.DataParallel(resnet.resnet101(pretrained=True, use_att=args.use_att, num_classes=len(TRASH_DICT)))
+    model = nn.DataParallel(resnet.resnet101(pretrained=not args.no_pretrain if not args.resume else False,
+                                             use_att=args.use_att, num_classes=len(TRASH_DICT)))
 elif args.arch == 'resnet152_base':
-    model = nn.DataParallel(resnet.resnet152(pretrained=True, use_att=args.use_att, num_classes=len(TRASH_DICT)))
+    model = nn.DataParallel(resnet.resnet152(pretrained=not args.no_pretrain if not args.resume else False,
+                                             use_att=args.use_att, num_classes=len(TRASH_DICT)))
 
 checkpoint = torch.load(args.resume, map_location=device)
 state_dict = checkpoint['state_dict']
