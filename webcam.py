@@ -33,7 +33,6 @@ if torch.cuda.is_available() and args.cuda:
 else:
     device = torch.device('cpu')
 
-model = nn.DataParallel(resnet.resnet18(pretrained=True, use_att=args.use_att, num_classes=len(TRASH_DICT)))
 if args.arch == 'resnet18_base':
     model = nn.DataParallel(resnet.resnet18(pretrained=not args.no_pretrain if not args.resume else False,
                                             use_att=args.use_att, num_classes=len(TRASH_DICT)))
@@ -49,6 +48,8 @@ elif args.arch == 'resnet101_base':
 elif args.arch == 'resnet152_base':
     model = nn.DataParallel(resnet.resnet152(pretrained=not args.no_pretrain if not args.resume else False,
                                              use_att=args.use_att, num_classes=len(TRASH_DICT)))
+else:
+    model = nn.DataParallel(resnet.resnet18(pretrained=True, use_att=args.use_att, num_classes=len(TRASH_DICT)))
 
 checkpoint = torch.load(args.resume, map_location=device)
 state_dict = checkpoint['state_dict']
