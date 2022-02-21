@@ -7,6 +7,7 @@ torchvision~=0.11.3
 pillow~=8.4.0
 requests~=2.24.0
 six~=1.16.0
+flask~=2.0.2
 
 -f https://download.pytorch.org/whl/torch_stable.html
 pytorch~=1.10.2
