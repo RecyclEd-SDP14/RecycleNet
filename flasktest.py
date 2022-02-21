@@ -9,6 +9,7 @@ ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
 
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = os.path.join(os.getcwd(), UPLOAD_FOLDER)
+app.config['SECRET_KEY'] = 'secure af'
 net = flasknet.FlaskNet(152, True, True, 'save' + delimiter() + '152att' + delimiter() + 'model_best.pth.tar')
 
 def allowed_file(filename):
