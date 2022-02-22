@@ -42,7 +42,7 @@ def upload_file():
             filename = secure_filename(file.filename)
             file_loc = os.path.join(app.config['UPLOAD_FOLDER'], filename)
             file.save(file_loc)
-            return predict(file_loc) #  redirect(url_for('upload_file', name=filename))
+            return predict(file_loc)
     return '''
     <!doctype html>
     <title>Upload new File</title>
