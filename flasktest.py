@@ -2,6 +2,7 @@ from flask import Flask, flash, request, redirect
 from utils import delimiter
 import flasknet
 import os
+import secrets
 from werkzeug.utils import secure_filename
 UPLOAD_FOLDER = 'images'
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
@@ -9,8 +10,8 @@ ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
 
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = os.path.join(os.getcwd(), UPLOAD_FOLDER)
-app.config['SECRET_KEY'] = 'secure af'
-net = flasknet.FlaskNet(152, True, True, 'save' + delimiter() + '152att' + delimiter() + 'model_best.pth.tar')
+app.config['SECRET_KEY'] = secrets.token_hex(256)
+net = flasknet.FlaskNet(152, True, True, 'save' + delimiter() + 'model_best.pth.tar')
 
 def allowed_file(filename):
     return '.' in filename and \
@@ -51,4 +52,6 @@ def upload_file():
       <input type=submit value=Upload>
     </form>
     '''
-app.run()
+
+
+app.run(host='0.0.0.0')
