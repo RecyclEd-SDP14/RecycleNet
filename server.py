@@ -4,6 +4,7 @@ import flasknet
 import os
 import secrets
 from werkzeug.utils import secure_filename
+from waitress import serve
 
 UPLOAD_FOLDER = 'images'
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
@@ -57,4 +58,4 @@ def upload_file():
     '''
 
 
-app.run(host='0.0.0.0')
+serve(app, host='0.0.0.0', port=5000)
