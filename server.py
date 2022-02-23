@@ -4,18 +4,20 @@ import flasknet
 import os
 import secrets
 from werkzeug.utils import secure_filename
+
 UPLOAD_FOLDER = 'images'
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
-
 
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = os.path.join(os.getcwd(), UPLOAD_FOLDER)
 app.config['SECRET_KEY'] = secrets.token_hex(256)
 net = flasknet.FlaskNet(152, True, True, 'save' + delimiter() + 'model_best.pth.tar')
 
+
 def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
 
 @app.route('/')
 def hello():
@@ -25,7 +27,8 @@ def hello():
 def predict(file):
     return net.classify(file)
 
-@app.route('/foo', methods=['GET', 'POST'])
+
+@app.route('/classify', methods=['GET', 'POST'])
 def upload_file():
     if request.method == 'POST':
         # check if the post request has the file part

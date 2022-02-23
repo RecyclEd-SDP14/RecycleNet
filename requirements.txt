@@ -11,3 +11,4 @@ flask~=2.0.2
 
 -f https://download.pytorch.org/whl/torch_stable.html
 pytorch~=1.10.2
+werkzeug~=2.0.2
