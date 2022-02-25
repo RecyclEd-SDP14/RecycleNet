@@ -1,3 +1,4 @@
+import argparse
 from flask import Flask, flash, request, redirect
 from utils import delimiter
 import flasknet
@@ -5,6 +6,11 @@ import os
 import secrets
 from werkzeug.utils import secure_filename
 from waitress import serve
+
+parser = argparse.ArgumentParser(description='RecycleNet server runner')
+parser.add_argument('--debug', action='store_true', help="Use dev server")
+args = parser.parse_args()
+
 
 UPLOAD_FOLDER = 'images'
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
@@ -58,4 +64,7 @@ def upload_file():
     '''
 
 
-serve(app, host='0.0.0.0', port=5000)
+if args.debug:
+    app.run(host='0.0.0.0')  # Run with Flask
+else:
+    serve(app, host='0.0.0.0', port=5000)  # Run with Waitress
