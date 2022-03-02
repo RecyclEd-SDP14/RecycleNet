@@ -1,7 +1,15 @@
 import argparse
 import os
 import random
-from utils import delimiter
+import platform
+
+
+def delimiter():
+	if platform.system() == 'Windows':
+		separator = "\\"
+	else:
+		separator = "/"
+	return separator
 
 
 def get_arguments():

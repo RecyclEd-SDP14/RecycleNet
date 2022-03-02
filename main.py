@@ -13,8 +13,9 @@ import torch.utils.data
 from torch.utils.data import DataLoader
 from torchvision import transforms
 
+import data
+import new_data
 import resnet
-from data import TrashDataset
 
 
 def get_arguments():
@@ -48,6 +49,7 @@ def get_arguments():
     parser.add_argument('-j', '--workers', default=4, type=int, metavar='N',
                         help='number of data loading workers (default: 4)')
     parser.add_argument('--seed', default=1234, type=int, help='seed for initializing training. ')
+    parser.add_argument('--new_data', action='store_true', help='use scott\'s relabelled dataset')
     return parser.parse_args()
 
 
@@ -84,7 +86,6 @@ def main():
     else:
         device = torch.device('cpu')
 
-    model = nn.DataParallel(resnet.resnet18(pretrained=True, num_classes=5, use_att=False).to(device))
     if args.arch == 'resnet18_base':
         model = nn.DataParallel(
             resnet.resnet18(pretrained=True if not args.resume else False, num_classes=6, use_att=args.use_att,
@@ -105,6 +106,8 @@ def main():
         model = nn.DataParallel(
             resnet.resnet152(pretrained=not args.no_pretrain if not args.resume else False, num_classes=6,
                              use_att=args.use_att, att_mode=args.att_mode).to(device))
+    else:
+        model = nn.DataParallel(resnet.resnet18(pretrained=True, num_classes=5, use_att=False).to(device))
 
     print(model)
     print('Number of model parameters: {}'.format(
@@ -140,7 +143,10 @@ def main():
         transforms.RandomHorizontalFlip(),
         transforms.ToTensor(),
         transforms.Normalize(mean=MEAN, std=STD)])
-    train_dataset = TrashDataset(ROOT_DIR, train_img_transform, 'train')
+    if args.new_data is True:
+        train_dataset = new_data.TrashDataset(ROOT_DIR, train_img_transform, 'train')
+    else:
+        train_dataset = data.TrashDataset(ROOT_DIR, train_img_transform, 'train')
     train_loader = DataLoader(train_dataset, batch_size=BATCH_SIZE, shuffle=True, num_workers=args.workers,
                               pin_memory=True)
 
@@ -149,7 +155,10 @@ def main():
         transforms.CenterCrop(224),
         transforms.ToTensor(),
         transforms.Normalize(mean=MEAN, std=STD)])
-    val_dataset = TrashDataset(ROOT_DIR, val_img_transform, 'val')
+    if args.new_data is True:
+        val_dataset = new_data.TrashDataset(ROOT_DIR, val_img_transform, 'val')
+    else:
+        val_dataset = data.TrashDataset(ROOT_DIR, val_img_transform, 'val')
     val_loader = DataLoader(val_dataset, batch_size=BATCH_SIZE, shuffle=False, num_workers=args.workers,
                             pin_memory=True)
 
@@ -158,7 +167,10 @@ def main():
         transforms.CenterCrop(224),
         transforms.ToTensor(),
         transforms.Normalize(mean=MEAN, std=STD)])
-    test_dataset = TrashDataset(ROOT_DIR, test_img_transform, 'test')
+    if args.new_data is True:
+        test_dataset = new_data.TrashDataset(ROOT_DIR, test_img_transform, 'test')
+    else:
+        test_dataset = data.TrashDataset(ROOT_DIR, test_img_transform, 'test')
     test_loader = DataLoader(test_dataset, batch_size=BATCH_SIZE, shuffle=False, num_workers=args.workers,
                              pin_memory=True)
 
