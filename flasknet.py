@@ -5,13 +5,21 @@ from torch.autograd import Variable
 from torchvision import transforms
 from PIL import Image
 
-TRASH_DICT = {
+
+"""TRASH_DICT = {
     '1': 'glass',
     '2': 'metal',
     '3': 'paper',
     '4': 'plastic',
     '5': 'metal',
     '6': 'trash'
+}"""
+
+TRASH_DICT = {
+    '1': 'can',
+    '2': 'glass_bottle',
+    '3': 'plastic_bottle',
+    '4': 'trash'
 }
 
 class FlaskNet:
