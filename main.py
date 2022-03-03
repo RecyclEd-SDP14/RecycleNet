@@ -86,25 +86,30 @@ def main():
     else:
         device = torch.device('cpu')
 
+    if args.new_data:
+        n_classes = 4
+    else:
+        n_classes = 6
+
     if args.arch == 'resnet18_base':
         model = nn.DataParallel(
-            resnet.resnet18(pretrained=True if not args.resume else False, num_classes=6, use_att=args.use_att,
+            resnet.resnet18(pretrained=True if not args.resume else False, num_classes=n_classes, use_att=args.use_att,
                             att_mode=args.att_mode).to(device))
     elif args.arch == 'resnet34_base':
         model = nn.DataParallel(
-            resnet.resnet34(pretrained=not args.no_pretrain if not args.resume else False, num_classes=6,
+            resnet.resnet34(pretrained=not args.no_pretrain if not args.resume else False, num_classes=n_classes,
                             use_att=args.use_att, att_mode=args.att_mode).to(device))
     elif args.arch == 'resnet50_base':
         model = nn.DataParallel(
-            resnet.resnet50(pretrained=not args.no_pretrain if not args.resume else False, num_classes=6,
+            resnet.resnet50(pretrained=not args.no_pretrain if not args.resume else False, num_classes=n_classes,
                             use_att=args.use_att, att_mode=args.att_mode).to(device))
     elif args.arch == 'resnet101_base':
         model = nn.DataParallel(
-            resnet.resnet101(pretrained=not args.no_pretrain if not args.resume else False, num_classes=6,
+            resnet.resnet101(pretrained=not args.no_pretrain if not args.resume else False, num_classes=n_classes,
                              use_att=args.use_att, att_mode=args.att_mode).to(device))
     elif args.arch == 'resnet152_base':
         model = nn.DataParallel(
-            resnet.resnet152(pretrained=not args.no_pretrain if not args.resume else False, num_classes=6,
+            resnet.resnet152(pretrained=not args.no_pretrain if not args.resume else False, num_classes=n_classes,
                              use_att=args.use_att, att_mode=args.att_mode).to(device))
     else:
         model = nn.DataParallel(resnet.resnet18(pretrained=True, num_classes=5, use_att=False).to(device))
