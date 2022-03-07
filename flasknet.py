@@ -5,31 +5,36 @@ from torch.autograd import Variable
 from torchvision import transforms
 from PIL import Image
 
-
-"""TRASH_DICT = {
-    '1': 'glass',
-    '2': 'metal',
-    '3': 'paper',
-    '4': 'plastic',
-    '5': 'metal',
-    '6': 'trash'
-}"""
-
-TRASH_DICT = {
-    '1': 'can',
-    '2': 'glass_bottle',
-    '3': 'plastic_bottle',
-    '4': 'trash'
-}
-
 class FlaskNet:
-    def __init__(self, size, pretrain, attention, model_dir):
+    def __init__(self, new_dict, pretrain, attention, model_dir):
         if torch.cuda.is_available():
             self.device = torch.device('cuda')
         else:
             self.device = torch.device('cpu')
 
-        self.model = nn.DataParallel(resnet.resnet152(pretrained=pretrain, use_att=attention, num_classes=len(TRASH_DICT)))
+        if new_dict:
+            self.TRASH_DICT = {
+                '1': 'can',
+                '2': 'glass_bottle',
+                '3': 'plastic_bottle',
+                '4': 'trash',
+                '5': 'trash_cardboard',
+                '6': 'trash_glass',
+                '7': 'trash_metal',
+                '8': 'trash_paper',
+                '9': 'trash_plastic'
+            }
+        else:
+            self.TRASH_DICT = {
+                '1': 'glass',
+                '2': 'metal',
+                '3': 'paper',
+                '4': 'plastic',
+                '5': 'metal',
+                '6': 'trash'
+            }
+
+        self.model = nn.DataParallel(resnet.resnet152(pretrained=pretrain, use_att=attention, num_classes=len(self.TRASH_DICT)))
 
         checkpoint = torch.load(model_dir, map_location=self.device)
         state_dict = checkpoint['state_dict']
@@ -58,6 +63,6 @@ class FlaskNet:
         output = self.model(Variable(image_tensor))
         pred = torch.Tensor.cpu(softmax(output[0].data)).numpy()
         trash_idx = str(pred.argmax() + 1)
-        pred_class, confidence = TRASH_DICT[trash_idx], pred.max()
+        pred_class, confidence = self.TRASH_DICT[trash_idx], pred.max()
 
         return pred_class, confidence

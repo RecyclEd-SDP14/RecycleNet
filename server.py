@@ -9,7 +9,12 @@ from waitress import serve
 
 parser = argparse.ArgumentParser(description='RecycleNet server runner')
 parser.add_argument('--debug', action='store_true', help="Use dev server")
+parser.add_argument('--new', action='store_true', help="Use new classification")
 args = parser.parse_args()
+if args.new:
+    folder = "NewData"
+else:
+    folder = "OldData"
 
 
 UPLOAD_FOLDER = 'images'
@@ -18,7 +23,7 @@ ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = os.path.join(os.getcwd(), UPLOAD_FOLDER)
 app.config['SECRET_KEY'] = secrets.token_hex(256)
-net = flasknet.FlaskNet(152, True, True, 'save' + delimiter() + 'model_best.pth.tar')
+net = flasknet.FlaskNet(args.new, True, True, 'save' + delimiter() + folder + delimiter() + 'model_best.pth.tar')
 
 
 def allowed_file(filename):
@@ -52,7 +57,9 @@ def upload_file():
             filename = secure_filename(file.filename)
             file_loc = os.path.join(app.config['UPLOAD_FOLDER'], filename)
             file.save(file_loc)
-            return predict(file_loc)
+            rv = predict(file_loc)
+            os.remove(file_loc)
+            return rv
     return '''
     <!doctype html>
     <title>Upload new File</title>
