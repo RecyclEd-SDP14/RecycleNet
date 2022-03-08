@@ -87,7 +87,7 @@ def main():
         device = torch.device('cpu')
 
     if args.new_data:
-        n_classes = 4
+        n_classes = 9
     else:
         n_classes = 6
 

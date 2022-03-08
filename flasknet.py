@@ -14,14 +14,14 @@ class FlaskNet:
 
         if new_dict:
             self.TRASH_DICT = {
-                '1': 'can',
-                '2': 'glass_bottle',
-                '3': 'plastic_bottle',
-                '4': 'trash',
+                '1': 'glass_bottle',
+                '2': 'trash',
+                '3': 'can',
+                '4': 'trash_glass',
                 '5': 'trash_cardboard',
-                '6': 'trash_glass',
-                '7': 'trash_metal',
-                '8': 'trash_paper',
+                '6': 'plastic_bottle',
+                '7': 'trash_paper',
+                '8': 'trash_metal',
                 '9': 'trash_plastic'
             }
         else:
