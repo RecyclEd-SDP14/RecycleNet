@@ -35,6 +35,14 @@ def allowed_file(filename):
 def hello():
     return os.getcwd()
 
+@app.route('/coupon')
+def email():
+    return '''
+    <!doctype html>
+    <title>Work in progress</title>
+    <h1>Hello! This page isn't implemented yet!</h1><br>
+    <h2>In future you'll be able to enter your email here to get your voucher.</h2>
+    '''
 
 def predict(file):
     return net.classify(file)

@@ -34,7 +34,7 @@ class FlaskNet:
                 '6': 'trash'
             }
 
-        self.model = nn.DataParallel(resnet.resnet152(pretrained=pretrain, use_att=attention, num_classes=len(self.TRASH_DICT)))
+        self.model = nn.DataParallel(resnet.resnet152(pretrained=pretrain, use_att=False, num_classes=len(self.TRASH_DICT)))
 
         checkpoint = torch.load(model_dir, map_location=self.device)
         state_dict = checkpoint['state_dict']
