@@ -6,11 +6,14 @@ import os
 import secrets
 from werkzeug.utils import secure_filename
 from waitress import serve
+import smtplib
+from email.message import EmailMessage
 
 parser = argparse.ArgumentParser(description='RecycleNet server runner')
 parser.add_argument('--debug', action='store_true', help="Use dev server")
 parser.add_argument('--new', action='store_true', help="Use new classification")
 args = parser.parse_args()
+s = smtplib.SMTP('localhost')
 if args.new:
     folder = "NewData"
 else:
@@ -37,12 +40,33 @@ def hello():
 
 @app.route('/coupon')
 def email():
+    uid = request.args.get('uid')
     return '''
     <!doctype html>
-    <title>Work in progress</title>
-    <h1>Hello! This page isn't implemented yet!</h1><br>
-    <h2>In future you'll be able to enter your email here to get your voucher.</h2>
-    '''
+    <title>Coupon Email Thing</title>
+    <h1>Hello! This page isn't fully implemented yet!</h1><br>
+    <h2>Enter your email here to get your voucher.</h2>
+    <form method="POST">
+    <input name="text">
+    <input type="submit">
+    </form>
+    Your user ID is: 
+    ''' + uid
+
+@app.route('/coupon', methods=['POST'])
+def email2():
+    uid = request.args.get('uid')
+    msg = EmailMessage()
+    msg.set_content('Thanks for using RecyclED. This coupon is totes worth £0.10. (Transaction id: ' + uid + ')')
+
+    msg['Subject'] = "Your coupon from RecyclED"
+    msg['From'] = "coupons@RecyclED.scot"
+    msg['To'] = request.form['text']
+    s.send_message(msg)
+    return """
+    <!doctype html>
+    Email sent to: 
+    """ + request.form['text']
 
 def predict(file):
     return net.classify(file)
