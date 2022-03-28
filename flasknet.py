@@ -44,7 +44,7 @@ class FlaskNet:
 
     def classify(self, img_dir):
         pred_class, confidence = self.inference(img_dir)
-        return f'Prediction: {pred_class}, Confidence: {confidence}'
+        return pred_class, confidence
 
     def inference(self, save_dir):
         frame = Image.open(save_dir)

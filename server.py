@@ -1,19 +1,21 @@
 import argparse
+
+import flask
 from flask import Flask, flash, request, redirect
+from flask_mail import Mail, Message
 from utils import delimiter
 import flasknet
 import os
 import secrets
 from werkzeug.utils import secure_filename
 from waitress import serve
-import smtplib
-from email.message import EmailMessage
+import db
+
 
 parser = argparse.ArgumentParser(description='RecycleNet server runner')
 parser.add_argument('--debug', action='store_true', help="Use dev server")
 parser.add_argument('--new', action='store_true', help="Use new classification")
 args = parser.parse_args()
-s = smtplib.SMTP('localhost')
 if args.new:
     folder = "NewData"
 else:
@@ -26,6 +28,12 @@ ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = os.path.join(os.getcwd(), UPLOAD_FOLDER)
 app.config['SECRET_KEY'] = secrets.token_hex(256)
+app.config['MAIL_SERVER'] = 'smtp.sendgrid.net'
+app.config['MAIL_PORT'] = 587
+app.config['MAIL_USE_TLS'] = True
+app.config['MAIL_USERNAME'] = 'apikey'
+app.config['MAIL_PASSWORD'] = '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'
+app.config['MAIL_DEFAULT_SENDER'] = 'RecyclED.scot@protonmail.com'
 net = flasknet.FlaskNet(args.new, True, True, 'save' + delimiter() + folder + delimiter() + 'model_best.pth.tar')
 
 
@@ -56,13 +64,12 @@ def email():
 @app.route('/coupon', methods=['POST'])
 def email2():
     uid = request.args.get('uid')
-    msg = EmailMessage()
-    msg.set_content('Thanks for using RecyclED. This coupon is totes worth £0.10. (Transaction id: ' + uid + ')')
 
-    msg['Subject'] = "Your coupon from RecyclED"
-    msg['From'] = "coupons@RecyclED.scot"
-    msg['To'] = request.form['text']
-    s.send_message(msg)
+    msg = Message('Your coupon from Recycled', recipients=[request.form['text']], sender='RecyclED.scot@protonmail.com')
+    msg.body = 'Thanks for using RecyclED. This coupon is totes worth £0.10. (Transaction id: ' + uid + ')'
+    msg.html = 'Thanks for using RecyclED. This coupon is totes worth £0.10. (Transaction id: ' + uid + ')'
+    mail = Mail(app)
+    mail.send(msg)
     return """
     <!doctype html>
     Email sent to: 
@@ -89,8 +96,12 @@ def upload_file():
             filename = secure_filename(file.filename)
             file_loc = os.path.join(app.config['UPLOAD_FOLDER'], filename)
             file.save(file_loc)
-            rv = predict(file_loc)
+            pr_class, p = predict(file_loc)
             os.remove(file_loc)
+            rv = flask.jsonify(
+                prediction=pr_class,
+                confidence=float(p)
+            )
             return rv
     return '''
     <!doctype html>
@@ -101,6 +112,23 @@ def upload_file():
       <input type=submit value=Upload>
     </form>
     '''
+
+@app.route('/stats')
+def getstats():
+    device_name = request.args.get('device')
+    value = db.print_refund_value_per_device(device_name)
+    items = db.print_recycling_totals_per_device(device_name)
+    total = items[1]+items[2]+items[3]+items[4]
+    response = flask.jsonify(
+        value = int(value[1]),
+        glass  = int(items[1]),
+        plastic = int(items[2]),
+        cans = int(items[3]),
+        trash = int(items[4]),
+        total = int(total)
+    )
+    return response
+
 
 
 if args.debug:
