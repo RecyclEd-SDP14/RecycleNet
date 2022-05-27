@@ -7,10 +7,15 @@ from PIL import Image
 from utils import delimiter
 
 TRASH_DICT = {
-    '1': 'can',
-    '2': 'glass_bottle',
-    '3': 'plastic_bottle',
-    '4': 'trash'
+    '1': 'glass_bottle',
+    '2': 'trash',
+    '3': 'can',
+    '4': 'trash_glass',
+    '5': 'trash_cardboard',
+    '6': 'plastic_bottle',
+    '7': 'trash_paper',
+    '8': 'trash_metal',
+    '9': 'trash_plastic'
 }
 
 
@@ -25,7 +30,7 @@ class TrashDataset(Dataset):
         self.val_img_file = os.path.join(root_dir, 'val_index.txt')
         self.test_img_file = os.path.join(root_dir, 'test_index.txt')
 
-        img_dirs = [x[0] for x in os.walk(os.path.join(root_dir, 'dataset-filtered'))][1:]
+        img_dirs = [x[0] for x in os.walk(os.path.join(root_dir, 'trashnet-filtered'))][1:]
         img_dirs_dict = {}
 
         for img_dir in img_dirs:
