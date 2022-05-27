@@ -16,6 +16,7 @@ from torchvision import transforms
 import data
 import new_data
 import resnet
+import wandb
 
 
 def get_arguments():
@@ -55,6 +56,13 @@ def get_arguments():
 
 def main():
     args = get_arguments()
+
+    wandb.init(project="RecycleNet", entity="01smito01")
+    wandb.config = {
+        "learning_rate": args.lr,
+        "epochs": args.epochs,
+        "batch_size": args.b
+    }
 
     if args.seed is not None:
         random.seed(args.seed)
@@ -114,7 +122,6 @@ def main():
     else:
         model = nn.DataParallel(resnet.resnet18(pretrained=True, num_classes=5, use_att=False).to(device))
 
-    print(model)
     print('Number of model parameters: {}'.format(
         sum([p.data.nelement() for p in model.parameters()])))
 
@@ -223,6 +230,9 @@ def train(args, train_loader, model, criterion, optimizer, epoch, device):
         output = model(input)
 
         loss = criterion(output[0], target)
+
+        wandb.log({"loss": loss})
+        wandb.watch(model)
 
         acc1 = accuracy(output[0], target)
         losses.update(loss.item(), input.size(0))
