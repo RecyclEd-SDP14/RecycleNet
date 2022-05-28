@@ -50,19 +50,21 @@ def get_arguments():
     parser.add_argument('-j', '--workers', default=4, type=int, metavar='N',
                         help='number of data loading workers (default: 4)')
     parser.add_argument('--seed', default=1234, type=int, help='seed for initializing training. ')
-    parser.add_argument('--new_data', action='store_true', help='use scott\'s relabelled dataset')
+    parser.add_argument('--new_data', action='store_true', help='use Scott\'s relabelled dataset')
+    parser.add_argument('--wandb', action='store_true')
     return parser.parse_args()
 
 
 def main():
     args = get_arguments()
 
-    wandb.init(project="RecycleNet", entity="01smito01")
-    wandb.config = {
-        "learning_rate": args.lr,
-        "epochs": args.epochs,
-        "batch_size": args.b
-    }
+    if args.wandb:
+        wandb.init(project="RecycleNet", entity="01smito01")
+        wandb.config = {
+            "learning_rate": args.lr,
+            "epochs": args.epochs,
+            "batch_size": args.b
+        }
 
     if args.seed is not None:
         random.seed(args.seed)
@@ -231,8 +233,9 @@ def train(args, train_loader, model, criterion, optimizer, epoch, device):
 
         loss = criterion(output[0], target)
 
-        wandb.log({"loss": loss})
-        wandb.watch(model)
+        if args.wandb:
+            wandb.log({"loss": loss})
+            wandb.watch(model)
 
         acc1 = accuracy(output[0], target)
         losses.update(loss.item(), input.size(0))
